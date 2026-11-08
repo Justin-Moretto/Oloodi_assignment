@@ -2,12 +2,12 @@
 
 A small staffing app for the Oloodi coding challenge. An event manager invites three workers to one shift. Workers accept or decline, then check in and check out. The manager dashboard stays in sync across browser sessions.
 
-This repository is in progress. Setup below is enough to run the app shell. Database functions, live updates, tests, and measured timings are still being added. See `TODO.md`.
+This repository is in progress. The app reads one hosted Supabase project. Tests, measured timings, and deployment are still open. See `TODO.md`.
 
 ## Requirements
 
 - Node.js 22 or newer (`node -v`)
-- A Supabase project, or the local Supabase CLI, once the schema lands
+- A Supabase project. Run `supabase/migrations/20261107140000_staffing_schema.sql`, then `supabase/seed.sql`, in the SQL editor.
 
 The machine used for this project had Node 14 on `PATH`. Development uses Node 22.23.4.
 

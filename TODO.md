@@ -12,27 +12,27 @@ Deadline: Monday, November 9, 2026, end of day.
 
 ## Phase 2 — Database
 
-Paused before the local database was started. Docker Desktop was shut down.
+Schema and seed are applied on the hosted Supabase project. There is no local Docker database.
 
 - [x] Migration and seed written (`supabase/migrations`, `supabase/seed.sql`)
-- [ ] Apply with `npm run db:start`, then `npm run db:reset`, and fix anything that fails
+- [x] Apply the migration and seed in the hosted SQL editor
 - [ ] Confirm anon can read, cannot write tables directly, and can call the RPC functions
 - [ ] Confirm repeated check-in does not change `checked_in_at`
 - [ ] Confirm two simultaneous accepts cannot exceed 3 filled spots
 
 ## Phase 3 — Core frontend
 
-- [ ] Dashboard query and derived counts
-- [ ] Manager dashboard
-- [ ] Worker view
-- [ ] Mutations with error feedback
+- [x] Dashboard query and derived counts
+- [x] Manager dashboard
+- [x] Worker view
+- [x] Mutations with error feedback
 
 ## Phase 4 — Real-time reliability
 
-- [ ] Postgres Changes subscription
-- [ ] Invalidate + refetch (do not trust the event payload as the UI state)
-- [ ] Live / Reconnecting / Offline indicator
-- [ ] Refetch on reconnect, focus, and online
+- [x] Postgres Changes subscription
+- [x] Invalidate + refetch (do not trust the event payload as the UI state)
+- [x] Live / Reconnecting / Offline indicator
+- [x] Refetch on reconnect, focus, and online
 - [ ] Latency and recovery timing hooks (no invented numbers)
 
 ## Phase 5 — Testing and submission
@@ -47,8 +47,6 @@ Paused before the local database was started. Docker Desktop was shut down.
 
 ## Blocked on you
 
-- Create a Supabase project, or confirm local Docker Supabase is OK
-- Provide `VITE_SUPABASE_URL` and the anon key only — never the service-role key
 - Vercel account when we deploy
 
 ## Decisions already locked
