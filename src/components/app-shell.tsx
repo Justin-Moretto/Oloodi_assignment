@@ -1,39 +1,37 @@
-import { NavLink, Outlet } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 
-import { cn } from '@/lib/utils'
-
-const links = [
-  { to: '/manager', label: 'Manager' },
-  { to: '/worker', label: 'Worker' },
-] as const
+import { Button } from '@/components/ui/button'
+import { ConnectionStatus } from '@/features/staffing/connection-status'
+import { useAssignmentRealtime } from '@/features/staffing/use-staffing'
 
 export function AppShell() {
+  const connection = useAssignmentRealtime()
+  const location = useLocation()
+  const signedIn = location.pathname !== '/'
+
   return (
-    <div className="min-h-svh bg-muted/40">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <div className="min-h-svh bg-background">
+      <header className="border-b border-slate-800/50 bg-header">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <div>
-            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <p className="text-xs font-medium tracking-wide text-primary uppercase">
               Oloodi
             </p>
             <p className="text-sm font-semibold text-foreground">Live Staffing</p>
           </div>
-          <nav aria-label="Primary" className="flex rounded-lg bg-muted p-1">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  cn(
-                    'rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors',
-                    isActive && 'bg-card text-foreground shadow-sm',
-                  )
-                }
+          <div className="flex items-center gap-4">
+            <ConnectionStatus state={connection} />
+            {signedIn ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-primary hover:bg-transparent hover:text-primary"
+                asChild
               >
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
+                <Link to="/">Log out</Link>
+              </Button>
+            ) : null}
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
