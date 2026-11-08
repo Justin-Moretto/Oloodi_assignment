@@ -9,7 +9,7 @@ import type { Database } from '@/types/database'
  * The worker dropdown does not prove identity.
  */
 export const supabase = createClient<Database>(
-  supabaseUrl ?? 'http://127.0.0.1:54321',
+  supabaseUrl ?? 'https://example.supabase.co',
   supabaseAnonKey ?? 'public-anon-key-not-configured',
   {
     auth: {

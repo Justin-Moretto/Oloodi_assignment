@@ -1,9 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { isSupabaseConfigured } from '@/lib/env'
 
 export function SetupNotice() {
-  if (isSupabaseConfigured) return null
-
   return (
     <Alert>
       <AlertTitle>Database not configured</AlertTitle>

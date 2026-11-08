@@ -24,13 +24,13 @@ export type MutationCode =
   | 'shift_full'
   | 'not_found'
 
-export interface MutationResult {
+export type MutationResult = {
   ok: boolean
   code: MutationCode
   message: string
 }
 
-export interface ShiftRow {
+export type ShiftRow = {
   id: string
   title: string
   date: string
@@ -40,12 +40,12 @@ export interface ShiftRow {
   required_workers: number
 }
 
-export interface WorkerRow {
+export type WorkerRow = {
   id: string
   name: string
 }
 
-export interface AssignmentRow {
+export type AssignmentRow = {
   id: string
   shift_id: string
   worker_id: string
