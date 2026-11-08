@@ -39,6 +39,7 @@
     --color-card: var(--card);
     --color-foreground: var(--foreground);
     --color-background: var(--background);
+    --color-header: var(--header);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -49,24 +50,25 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --background: #1c1c22;
+    --header: #09090b;
+    --foreground: #d1d5db;
+    --card: #e4e4df;
+    --card-foreground: #18181b;
+    --popover: #e4e4df;
+    --popover-foreground: #18181b;
+    --primary: #ff7f50;
+    --primary-foreground: #ffffff;
+    --secondary: #1f1f23;
+    --secondary-foreground: #e5e7eb;
+    --muted: #1f1f23;
+    --muted-foreground: #9ca3af;
+    --accent: #1f1f23;
+    --accent-foreground: #ffffff;
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: rgb(30 41 59 / 50%);
+    --input: #2a2a30;
+    --ring: #ff7f50;
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -118,6 +120,18 @@
 }
 
 @layer base {
+  [data-slot="card"] {
+    --foreground: #18181b;
+    --muted-foreground: #52525b;
+    --muted: #e7e5e4;
+    --border: #e4e4e7;
+    --input: #ffffff;
+    --secondary: #e7e5e4;
+    --secondary-foreground: #18181b;
+    --accent: #e7e5e4;
+    --accent-foreground: #18181b;
+  }
+
   * {
     @apply border-border outline-ring/50;
     }
@@ -126,6 +140,6 @@
     }
   html {
     @apply font-sans;
-    color-scheme: light;
+    color-scheme: dark;
     }
 }
