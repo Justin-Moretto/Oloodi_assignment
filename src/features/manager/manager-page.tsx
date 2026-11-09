@@ -41,67 +41,67 @@ function ManagerDashboard({ dashboard }: { dashboard: StaffingDashboard }) {
     { label: 'Checked out', value: counts.checkedOut, hint: 'Finished' },
   ] as const
 
+  if (!shift) return <ShiftCard shift={null} />
+
   return (
     <>
       <ShiftCard shift={shift} counts={counts} />
 
-      {shift ? (
-        <section aria-label="Staffing summary" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <Card key={stat.label} size="sm">
-              <CardHeader>
-                <CardDescription>{stat.label}</CardDescription>
-                <CardTitle className="text-2xl tabular-nums">{stat.value}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-xs text-muted-foreground">{stat.hint}</CardContent>
-            </Card>
-          ))}
-        </section>
-      ) : null}
+      <section aria-label="Staffing summary" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <Card key={stat.label} size="sm">
+            <CardHeader>
+              <CardDescription>{stat.label}</CardDescription>
+              <CardTitle className="text-2xl tabular-nums">{stat.value}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">{stat.hint}</CardContent>
+          </Card>
+        ))}
+      </section>
 
-      {shift ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Workers</CardTitle>
-            <CardDescription>
-              Invite uninvited or declined workers. Cancelled workers accept again themselves.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {assignments.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No workers are on this shift.</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Worker</TableHead>
-                    <TableHead>Participation</TableHead>
-                    <TableHead>Attendance</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {assignments.map((assignment) => (
-                    <WorkerRow
-                      key={assignment.id}
-                      assignment={assignment}
-                      pending={pendingId === assignment.id}
-                      onInvite={() =>
-                        action.mutate({ type: 'invite', assignmentId: assignment.id })
-                      }
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      ) : null}
+      <Card>
+        <CardHeader>
+          <CardTitle>Workers</CardTitle>
+          <CardDescription>
+            Invite uninvited or declined workers. Cancelled workers accept again themselves.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {assignments.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No workers are on this shift.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Worker</TableHead>
+                  <TableHead>Participation</TableHead>
+                  <TableHead>Attendance</TableHead>
+                  <TableHead>Checked in</TableHead>
+                  <TableHead>Checked out</TableHead>
+                  <TableHead>Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {assignments.map((assignment) => (
+                  <AssignmentTableRow
+                    key={assignment.id}
+                    assignment={assignment}
+                    pending={pendingId === assignment.id}
+                    onInvite={() =>
+                      action.mutate({ type: 'invite', assignmentId: assignment.id })
+                    }
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </>
   )
 }
 
-function WorkerRow({
+function AssignmentTableRow({
   assignment,
   pending,
   onInvite,
@@ -123,6 +123,8 @@ function WorkerRow({
       <TableCell>
         <AttendanceBadge status={assignment.attendance_status} />
       </TableCell>
+      <TableCell className="tabular-nums">{formatOptionalTime(assignment.checked_in_at)}</TableCell>
+      <TableCell className="tabular-nums">{formatOptionalTime(assignment.checked_out_at)}</TableCell>
       <TableCell>
         {canInvite ? (
           <Button
@@ -141,14 +143,13 @@ function WorkerRow({
   )
 }
 
+function formatOptionalTime(value: string | null): string {
+  return value ? formatTimestamp(value) : '—'
+}
+
+// Shown instead of the Invite button. Accepted rows need no manager action.
 function managerNote(assignment: StaffAssignment): string {
   if (assignment.participation_status === 'invited') return 'Awaiting response'
   if (assignment.participation_status === 'cancelled') return 'Worker can accept again'
-  if (assignment.checked_in_at && assignment.attendance_status === 'checked_in') {
-    return `Checked in ${formatTimestamp(assignment.checked_in_at)}`
-  }
-  if (assignment.checked_out_at && assignment.attendance_status === 'checked_out') {
-    return `Checked out ${formatTimestamp(assignment.checked_out_at)}`
-  }
-  return 'Not checked in'
+  return '—'
 }

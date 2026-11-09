@@ -25,7 +25,17 @@ export function LoginPage() {
 function LoginForm({ dashboard }: { dashboard: StaffingDashboard }) {
   const navigate = useNavigate()
   const [workerId, setWorkerId] = useState<string>()
+  const [flash, setFlash] = useState(0)
   const selected = dashboard.assignments.find((assignment) => assignment.worker_id === workerId)
+
+  function signInAsWorker() {
+    if (!selected) {
+      setFlash(0)
+      requestAnimationFrame(() => setFlash((count) => count + 1))
+      return
+    }
+    navigate(`/worker?worker=${selected.worker_id}`)
+  }
 
   return (
     <>
@@ -47,18 +57,12 @@ function LoginForm({ dashboard }: { dashboard: StaffingDashboard }) {
           <CardDescription>Choose your name. This list is not authentication.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          <Button
-            className="w-full bg-blue-700 text-white hover:bg-blue-800"
-            disabled={!selected}
-            onClick={() => {
-              if (!selected) return
-              navigate(`/worker?worker=${selected.worker_id}`)
-            }}
-          >
-            Worker
-          </Button>
           <Select value={selected?.worker_id} onValueChange={setWorkerId}>
-            <SelectTrigger className="w-full" aria-label="Worker">
+            <SelectTrigger
+              className={`w-full border-zinc-300 bg-white ${flash > 0 ? 'worker-select-flash' : ''}`}
+              data-flash={flash}
+              aria-label="Worker"
+            >
               <SelectValue placeholder="Choose a worker" />
             </SelectTrigger>
             <SelectContent>
@@ -69,6 +73,12 @@ function LoginForm({ dashboard }: { dashboard: StaffingDashboard }) {
               ))}
             </SelectContent>
           </Select>
+          <Button
+            className="w-full bg-blue-700 text-white hover:bg-blue-800"
+            onClick={signInAsWorker}
+          >
+            Worker
+          </Button>
         </CardContent>
       </Card>
     </>
