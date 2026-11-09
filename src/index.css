@@ -143,3 +143,17 @@
     color-scheme: dark;
     }
 }
+
+/* Outline buttons use the page background. On a light card or alert that
+   background is near-black and the text inherits the dark card color. */
+[data-slot="card"] [data-slot="button"][data-variant="outline"],
+[data-slot="alert"] [data-slot="button"][data-variant="outline"] {
+  background-color: #18181b;
+  color: #ffffff;
+}
+
+[data-slot="card"] [data-slot="button"][data-variant="outline"]:hover,
+[data-slot="alert"] [data-slot="button"][data-variant="outline"]:hover {
+  background-color: #27272a;
+  color: #ffffff;
+}
