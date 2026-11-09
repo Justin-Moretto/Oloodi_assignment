@@ -5,9 +5,11 @@ import { LoginPage } from '@/features/login/login-page'
 import { ManagerPage } from '@/features/manager/manager-page'
 import { WorkerPage } from '@/features/worker/worker-page'
 
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
+
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename || undefined}>
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<LoginPage />} />

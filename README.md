@@ -99,4 +99,4 @@ There is one shift. The capacity check in the SQL test runs two accepts in one t
 
 The production build is one JavaScript chunk of about 690 kB before gzip. Splitting the route screens would matter if the app grew.
 
-The app is not deployed. `npm run build` completes locally.
+The live site is [https://justin-moretto.github.io/Oloodi_assignment/](https://justin-moretto.github.io/Oloodi_assignment/). A push to `main` builds it with GitHub Actions and publishes GitHub Pages. The Supabase URL and anon key are repository secrets, not files in the repo.
