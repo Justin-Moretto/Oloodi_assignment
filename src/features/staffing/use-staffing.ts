@@ -7,10 +7,15 @@ import { isSupabaseConfigured } from '@/lib/env'
 import { supabase } from '@/lib/supabase/client'
 
 import { fetchStaffing, runAssignmentAction, type AssignmentAction } from '@/features/staffing/api'
+import {
+  deriveConnectionState,
+  shouldCatchUp,
+  type ConnectionState,
+} from '@/features/staffing/connection-state'
 
 export const staffingQueryKey = ['staffing'] as const
 
-export type ConnectionState = 'unconfigured' | 'offline' | 'reconnecting' | 'live'
+export type { ConnectionState }
 
 function refreshStaffing() {
   void queryClient.invalidateQueries({ queryKey: staffingQueryKey })
@@ -58,10 +63,8 @@ export function useAssignmentRealtime(): ConnectionState {
       )
       .subscribe((status) => {
         setChannelStatus(status)
-        if (status === 'SUBSCRIBED') {
-          if (connectedBefore) refreshStaffing()
-          connectedBefore = true
-        }
+        if (shouldCatchUp(connectedBefore, status)) refreshStaffing()
+        if (status === 'SUBSCRIBED') connectedBefore = true
       })
 
     const onOnline = () => setOnline(true)
@@ -76,8 +79,5 @@ export function useAssignmentRealtime(): ConnectionState {
     }
   }, [])
 
-  if (!isSupabaseConfigured) return 'unconfigured'
-  if (!online) return 'offline'
-  if (channelStatus === 'SUBSCRIBED') return 'live'
-  return 'reconnecting'
+  return deriveConnectionState(isSupabaseConfigured, online, channelStatus)
 }

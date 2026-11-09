@@ -30,4 +30,7 @@ Use the anon key only. Do not put the service-role key in `.env` or any frontend
 | `npm run dev` | Vite dev server |
 | `npm run build` | Typecheck and production build |
 | `npm run lint` | Oxlint |
+| `npm test` | Count rules and live-connection behavior |
 | `npm run preview` | Serve the production build |
+
+`npm test` covers the dashboard counts and the live, reconnecting, and offline states. `supabase/tests/staffing_rules.sql` checks status transitions, illegal actions, repeated check-in and check-out, and the three-worker capacity limit against the database functions. Run that whole script in the SQL editor. It rolls back, so the seeded shift stays as it is.
