@@ -5,13 +5,13 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { isSupabaseConfigured } from '@/lib/env'
 
-import type { StaffingDashboard } from '@/features/staffing/api'
+import type { StaffingData } from '@/features/staffing/api'
 import { useStaffingQuery } from '@/features/staffing/use-staffing'
 
 export function StaffingGate({
   children,
 }: {
-  children: (dashboard: StaffingDashboard) => ReactNode
+  children: (data: StaffingData) => ReactNode
 }) {
   const query = useStaffingQuery()
 

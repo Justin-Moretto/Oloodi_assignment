@@ -22,7 +22,7 @@ npm run dev
 
 Put the project URL and the anon key in `.env` as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Use the anon key only. Do not put the service-role key in `.env` or any frontend file.
 
-Open `/` and sign in as the manager or as a worker. Until `.env` is set, the screens show a setup notice and do not call the database.
+Open `/` and pick the manager or a worker. Until `.env` is set, the screens show a setup notice and do not call the database.
 
 This project was developed on Node 22.16. `react-router` prints a warning below 22.22. The app still runs.
 
@@ -32,7 +32,7 @@ This project was developed on Node 22.16. `react-router` prints a warning below 
 
 ## Architecture
 
-The app is one React client with three routes. `/` is a sign-in screen. `/manager` is the dashboard. `/worker?worker=<id>` is that worker's assignment. The sign-in list is a demo picker, not authentication.
+The app is one React client with three routes. `/` is a role picker. `/manager` is the dashboard. `/worker?worker=<id>` is that worker's assignment. The picker is for the demo, not authentication.
 
 One TanStack Query, key `['staffing']`, loads the shift, the workers, and the assignments. The client joins worker names and derives the counts from those same rows. Filled is the number of accepted workers, including anyone already checked in or checked out. Remaining is the capacity minus filled, and it does not go below zero. Checked in and checked out are attendance counts.
 
@@ -93,7 +93,7 @@ I used Cursor's agent to implement the schema, the screens, and the tests from t
 
 ## Limitations
 
-Sign-in does not prove who the person is. Anyone with the anon key can call the functions for any assignment. A real login would scope each call to the signed-in worker or manager.
+The role picker does not prove who the person is. Anyone with the anon key can call the functions for any assignment. A real login would scope each call to the signed-in worker or manager.
 
 There is one shift. The capacity check in the SQL test runs two accepts in one transaction. That is the same check the row lock serializes when two sessions overlap. The test does not open two database sessions.
 

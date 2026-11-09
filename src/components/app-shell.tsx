@@ -7,7 +7,7 @@ import { useAssignmentRealtime } from '@/features/staffing/use-staffing'
 export function AppShell() {
   const connection = useAssignmentRealtime()
   const location = useLocation()
-  const signedIn = location.pathname !== '/'
+  const onRolePicker = location.pathname === '/'
 
   return (
     <div className="min-h-svh bg-background">
@@ -21,16 +21,16 @@ export function AppShell() {
           </div>
           <div className="flex items-center gap-4">
             <ConnectionStatus state={connection} />
-            {signedIn ? (
+            {onRolePicker ? null : (
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-primary hover:bg-transparent hover:text-primary"
                 asChild
               >
-                <Link to="/">Log out</Link>
+                <Link to="/">Switch user</Link>
               </Button>
-            ) : null}
+            )}
           </div>
         </div>
       </header>

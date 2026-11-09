@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageHeader } from '@/components/page-header'
 
-import type { StaffAssignment, StaffingDashboard } from '@/features/staffing/api'
+import type { StaffAssignment, StaffingData } from '@/features/staffing/api'
 import { formatTimestamp } from '@/features/staffing/format'
 import { ShiftCard } from '@/features/staffing/shift-card'
 import { StaffingGate } from '@/features/staffing/staffing-gate'
@@ -14,16 +14,16 @@ import { useAssignmentAction } from '@/features/staffing/use-staffing'
 export function WorkerPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
-      <StaffingGate>{(dashboard) => <WorkerDashboard dashboard={dashboard} />}</StaffingGate>
+      <StaffingGate>{(data) => <WorkerView data={data} />}</StaffingGate>
     </div>
   )
 }
 
-function WorkerDashboard({ dashboard }: { dashboard: StaffingDashboard }) {
+function WorkerView({ data }: { data: StaffingData }) {
   const [params] = useSearchParams()
   const selectedId = params.get('worker')
   const selected =
-    dashboard.assignments.find((assignment) => assignment.worker_id === selectedId) ?? null
+    data.assignments.find((assignment) => assignment.worker_id === selectedId) ?? null
 
   if (!selected) return <Navigate to="/" replace />
 
@@ -33,7 +33,7 @@ function WorkerDashboard({ dashboard }: { dashboard: StaffingDashboard }) {
         title={selected.workerName}
         description="Respond to an invitation, then check in and out."
       />
-      <ShiftCard shift={dashboard.shift} />
+      <ShiftCard shift={data.shift} />
 
       <Card>
         <CardHeader>
@@ -85,7 +85,7 @@ function AssignmentTimes({ assignment }: { assignment: StaffAssignment }) {
 function WorkerActions({ assignment }: { assignment: StaffAssignment }) {
   const action = useAssignmentAction()
   const busy = action.isPending && action.variables?.assignmentId === assignment.id
-  const run = (type: 'accept' | 'decline' | 'cancel' | 'check-in' | 'check-out') => {
+  const run = (type: 'accept' | 'decline' | 'cancel' | 'check_in' | 'check_out') => {
     action.mutate({ type, assignmentId: assignment.id })
   }
 
@@ -126,7 +126,7 @@ function WorkerActions({ assignment }: { assignment: StaffAssignment }) {
   if (assignment.attendance_status === 'not_started') {
     return (
       <div className="flex gap-2">
-        <Button disabled={busy} onClick={() => run('check-in')}>
+        <Button disabled={busy} onClick={() => run('check_in')}>
           Check in
         </Button>
         <Button variant="outline" disabled={busy} onClick={() => run('cancel')}>
@@ -138,7 +138,7 @@ function WorkerActions({ assignment }: { assignment: StaffAssignment }) {
 
   if (assignment.attendance_status === 'checked_in') {
     return (
-      <Button disabled={busy} onClick={() => run('check-out')}>
+      <Button disabled={busy} onClick={() => run('check_out')}>
         Check out
       </Button>
     )

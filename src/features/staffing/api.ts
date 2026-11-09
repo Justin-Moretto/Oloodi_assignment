@@ -7,7 +7,7 @@ export interface StaffAssignment extends AssignmentRow {
   workerName: string
 }
 
-export interface StaffingDashboard {
+export interface StaffingData {
   shift: ShiftRow | null
   assignments: StaffAssignment[]
   counts: StaffingCounts
@@ -18,10 +18,10 @@ export type AssignmentAction =
   | { type: 'accept'; assignmentId: string }
   | { type: 'decline'; assignmentId: string }
   | { type: 'cancel'; assignmentId: string }
-  | { type: 'check-in'; assignmentId: string }
-  | { type: 'check-out'; assignmentId: string }
+  | { type: 'check_in'; assignmentId: string }
+  | { type: 'check_out'; assignmentId: string }
 
-export async function fetchStaffing(): Promise<StaffingDashboard> {
+export async function fetchStaffing(): Promise<StaffingData> {
   assertSupabaseConfigured()
 
   const [shiftResult, workerResult, assignmentResult] = await Promise.all([
@@ -67,9 +67,9 @@ export async function runAssignmentAction(action: AssignmentAction): Promise<Mut
       )
     case 'cancel':
       return unwrap(await supabase.rpc('cancel_assignment', { p_assignment_id: assignmentId }))
-    case 'check-in':
+    case 'check_in':
       return unwrap(await supabase.rpc('check_in_worker', { p_assignment_id: assignmentId }))
-    case 'check-out':
+    case 'check_out':
       return unwrap(await supabase.rpc('check_out_worker', { p_assignment_id: assignmentId }))
   }
 }

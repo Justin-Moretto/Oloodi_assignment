@@ -11,24 +11,24 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import type { StaffingDashboard } from '@/features/staffing/api'
+import type { StaffingData } from '@/features/staffing/api'
 import { StaffingGate } from '@/features/staffing/staffing-gate'
 
-export function LoginPage() {
+export function RolePickerPage() {
   return (
     <div className="mx-auto grid max-w-3xl gap-4 sm:grid-cols-2">
-      <StaffingGate>{(dashboard) => <LoginForm dashboard={dashboard} />}</StaffingGate>
+      <StaffingGate>{(data) => <RolePicker data={data} />}</StaffingGate>
     </div>
   )
 }
 
-function LoginForm({ dashboard }: { dashboard: StaffingDashboard }) {
+function RolePicker({ data }: { data: StaffingData }) {
   const navigate = useNavigate()
   const [workerId, setWorkerId] = useState<string>()
   const [flash, setFlash] = useState(0)
-  const selected = dashboard.assignments.find((assignment) => assignment.worker_id === workerId)
+  const selected = data.assignments.find((assignment) => assignment.worker_id === workerId)
 
-  function signInAsWorker() {
+  function openWorkerView() {
     if (!selected) {
       setFlash(0)
       requestAnimationFrame(() => setFlash((count) => count + 1))
@@ -66,7 +66,7 @@ function LoginForm({ dashboard }: { dashboard: StaffingDashboard }) {
               <SelectValue placeholder="Choose a worker" />
             </SelectTrigger>
             <SelectContent>
-              {dashboard.assignments.map((assignment) => (
+              {data.assignments.map((assignment) => (
                 <SelectItem key={assignment.worker_id} value={assignment.worker_id}>
                   {assignment.workerName}
                 </SelectItem>
@@ -75,7 +75,7 @@ function LoginForm({ dashboard }: { dashboard: StaffingDashboard }) {
           </Select>
           <Button
             className="w-full bg-blue-700 text-white hover:bg-blue-800"
-            onClick={signInAsWorker}
+            onClick={openWorkerView}
           >
             Worker
           </Button>

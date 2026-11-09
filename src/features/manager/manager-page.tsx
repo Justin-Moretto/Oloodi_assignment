@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageHeader } from '@/components/page-header'
 
-import type { StaffAssignment, StaffingDashboard } from '@/features/staffing/api'
+import type { StaffAssignment, StaffingData } from '@/features/staffing/api'
 import { formatTimestamp } from '@/features/staffing/format'
 import { ShiftCard } from '@/features/staffing/shift-card'
 import { StaffingGate } from '@/features/staffing/staffing-gate'
@@ -24,14 +24,14 @@ export function ManagerPage() {
         title="Manager dashboard"
         description="Invite workers and watch participation and attendance update live."
       />
-      <StaffingGate>{(dashboard) => <ManagerDashboard dashboard={dashboard} />}</StaffingGate>
+      <StaffingGate>{(data) => <ManagerDashboard data={data} />}</StaffingGate>
     </div>
   )
 }
 
-function ManagerDashboard({ dashboard }: { dashboard: StaffingDashboard }) {
+function ManagerDashboard({ data }: { data: StaffingData }) {
   const action = useAssignmentAction()
-  const { shift, assignments, counts } = dashboard
+  const { shift, assignments, counts } = data
   const pendingId = action.isPending ? action.variables?.assignmentId : undefined
 
   const stats = [
