@@ -138,10 +138,7 @@ begin
     );
   end if;
 
-  if v_row.participation_status not in ('uninvited', 'declined') then
-    return public.mutation_result(false, 'illegal_transition', 'This worker cannot be invited.');
-  end if;
-
+  -- Only uninvited and declined are left.
   update public.assignments
   set participation_status = 'invited'
   where id = p_assignment_id;
@@ -150,8 +147,7 @@ begin
 end;
 $$;
 
--- Worker accepts or declines. Acceptance locks the shift row so two
--- simultaneous accepts cannot pass the capacity check together.
+-- Worker accepts or declines an invitation, or accepts again after cancelling.
 create or replace function public.respond_to_invitation(
   p_assignment_id uuid,
   p_response text
@@ -162,7 +158,6 @@ security definer
 set search_path = public
 as $$
 declare
-  v_shift_id uuid;
   v_required integer;
   v_filled integer;
   v_row public.assignments;
@@ -171,45 +166,24 @@ begin
     return public.mutation_result(false, 'illegal_transition', 'Response must be accept or decline.');
   end if;
 
+  -- An accept locks the shift row before the assignment row. Two accepts on
+  -- the same shift then run one after the other, so the second one sees the
+  -- first one's result in the capacity count below.
   if p_response = 'accept' then
-    select shift_id
-    into v_shift_id
-    from public.assignments
-    where id = p_assignment_id;
-
-    if not found then
-      return public.mutation_result(false, 'not_found', 'Assignment not found.');
-    end if;
-
-    select required_workers
-    into v_required
+    perform 1
     from public.shifts
-    where id = v_shift_id
+    where id = (select shift_id from public.assignments where id = p_assignment_id)
     for update;
+  end if;
 
-    if v_required is null then
-      return public.mutation_result(false, 'not_found', 'Shift not found.');
-    end if;
+  select *
+  into v_row
+  from public.assignments
+  where id = p_assignment_id
+  for update;
 
-    select *
-    into v_row
-    from public.assignments
-    where id = p_assignment_id
-    for update;
-
-    if not found then
-      return public.mutation_result(false, 'not_found', 'Assignment not found.');
-    end if;
-  else
-    select *
-    into v_row
-    from public.assignments
-    where id = p_assignment_id
-    for update;
-
-    if not found then
-      return public.mutation_result(false, 'not_found', 'Assignment not found.');
-    end if;
+  if not found then
+    return public.mutation_result(false, 'not_found', 'Assignment not found.');
   end if;
 
   if p_response = 'decline' then
@@ -244,16 +218,19 @@ begin
     );
   end if;
 
-  if v_row.attendance_status <> 'not_started' then
-    return public.mutation_result(false, 'illegal_transition', 'Attendance has already started.');
-  end if;
+  -- Invited and cancelled rows are always "not started": the
+  -- assignments_attendance_requires_acceptance constraint guarantees it.
+
+  select required_workers
+  into v_required
+  from public.shifts
+  where id = v_row.shift_id;
 
   select count(*)
   into v_filled
   from public.assignments
   where shift_id = v_row.shift_id
-    and participation_status = 'accepted'
-    and id <> p_assignment_id;
+    and participation_status = 'accepted';
 
   if v_filled >= v_required then
     return public.mutation_result(false, 'shift_full', 'This shift is already fully staffed.');
@@ -261,13 +238,7 @@ begin
 
   update public.assignments
   set participation_status = 'accepted'
-  where id = p_assignment_id
-    and participation_status in ('invited', 'cancelled')
-    and attendance_status = 'not_started';
-
-  if not found then
-    return public.mutation_result(false, 'illegal_transition', 'Accept could not be recorded.');
-  end if;
+  where id = p_assignment_id;
 
   return public.mutation_result(true, 'accepted', 'Assignment accepted.');
 end;
@@ -306,13 +277,7 @@ begin
 
   update public.assignments
   set participation_status = 'cancelled'
-  where id = p_assignment_id
-    and participation_status = 'accepted'
-    and attendance_status = 'not_started';
-
-  if not found then
-    return public.mutation_result(false, 'illegal_transition', 'Cancellation could not be recorded.');
-  end if;
+  where id = p_assignment_id;
 
   return public.mutation_result(true, 'cancelled', 'Assignment cancelled.');
 end;
@@ -357,14 +322,7 @@ begin
   set
     attendance_status = 'checked_in',
     checked_in_at = clock_timestamp()
-  where id = p_assignment_id
-    and participation_status = 'accepted'
-    and attendance_status = 'not_started'
-    and checked_in_at is null;
-
-  if not found then
-    return public.mutation_result(false, 'illegal_transition', 'Check-in could not be recorded.');
-  end if;
+  where id = p_assignment_id;
 
   return public.mutation_result(true, 'checked_in', 'Checked in.');
 end;
@@ -405,15 +363,7 @@ begin
   set
     attendance_status = 'checked_out',
     checked_out_at = clock_timestamp()
-  where id = p_assignment_id
-    and participation_status = 'accepted'
-    and attendance_status = 'checked_in'
-    and checked_in_at is not null
-    and checked_out_at is null;
-
-  if not found then
-    return public.mutation_result(false, 'illegal_transition', 'Check-out could not be recorded.');
-  end if;
+  where id = p_assignment_id;
 
   return public.mutation_result(true, 'checked_out', 'Checked out.');
 end;

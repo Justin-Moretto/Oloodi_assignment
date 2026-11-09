@@ -74,28 +74,12 @@ export async function runAssignmentAction(action: AssignmentAction): Promise<Mut
   }
 }
 
-async function unwrap(result: {
-  data: unknown
-  error: { message: string } | null
-}): Promise<MutationResult> {
+// A transport error throws. A rule rejection comes back as { ok: false } and is
+// shown to the user as a toast, not thrown.
+function unwrap(result: { data: unknown; error: { message: string } | null }): MutationResult {
   if (result.error) throw new Error(result.error.message)
-  return parseMutationResult(result.data)
-}
-
-function parseMutationResult(data: unknown): MutationResult {
-  const value = typeof data === 'string' ? parseJson(data) : data
-  if (!isMutationResult(value)) {
-    throw new Error('Unexpected response from the database.')
-  }
-  return value
-}
-
-function parseJson(value: string): unknown {
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  if (!isMutationResult(result.data)) throw new Error('Unexpected response from the database.')
+  return result.data
 }
 
 function isMutationResult(value: unknown): value is MutationResult {

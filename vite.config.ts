@@ -3,15 +3,10 @@ import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import { defineConfig } from 'vite'
 
-// GitHub Pages serves the site from /Oloodi_assignment/. Local dev stays at /.
-const base = process.env.BASE_PATH?.endsWith('/')
-  ? process.env.BASE_PATH
-  : process.env.BASE_PATH
-    ? `${process.env.BASE_PATH}/`
-    : '/'
-
 export default defineConfig({
-  base,
+  // GitHub Pages serves the site from /Oloodi_assignment/ (set in the deploy
+  // workflow). Local dev stays at /.
+  base: process.env.BASE_PATH ?? '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

@@ -15,8 +15,8 @@ The submission write-up is `README.md`.
 - [x] Live-update and offline-recovery timings recorded in the README
 - [x] Reset script (`supabase/reset.sql`)
 - [x] `npm run build`
+- [x] GitHub Pages deploy
 
 ## Not part of this submission
 
 - Playwright
-- A hosted deploy

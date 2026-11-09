@@ -6,19 +6,17 @@ import { queryClient } from '@/app/query-client'
 import { isSupabaseConfigured } from '@/lib/env'
 import { supabase } from '@/lib/supabase/client'
 
-import { fetchStaffing, runAssignmentAction, type AssignmentAction } from '@/features/staffing/api'
+import { fetchStaffing, runAssignmentAction } from '@/features/staffing/api'
 import {
   deriveConnectionState,
   shouldCatchUp,
   type ConnectionState,
 } from '@/features/staffing/connection-state'
 
-export const staffingQueryKey = ['staffing'] as const
-
-export type { ConnectionState }
+const staffingQueryKey = ['staffing'] as const
 
 function refreshStaffing() {
-  void queryClient.invalidateQueries({ queryKey: staffingQueryKey })
+  return queryClient.invalidateQueries({ queryKey: staffingQueryKey })
 }
 
 export function useStaffingQuery() {
@@ -31,7 +29,7 @@ export function useStaffingQuery() {
 
 export function useAssignmentAction() {
   return useMutation({
-    mutationFn: (action: AssignmentAction) => runAssignmentAction(action),
+    mutationFn: runAssignmentAction,
     onSuccess: (result) => {
       if (result.ok) toast.success(result.message)
       else toast.error(result.message)
@@ -39,6 +37,8 @@ export function useAssignmentAction() {
     onError: (error: Error) => {
       toast.error(error.message)
     },
+    // Returning the refetch keeps the mutation pending until fresh rows arrive,
+    // so the button stays disabled instead of briefly showing the old state.
     onSettled: refreshStaffing,
   })
 }
@@ -58,12 +58,12 @@ export function useAssignmentRealtime(): ConnectionState {
         { event: '*', schema: 'public', table: 'assignments' },
         () => {
           // The event is only a signal. The next read loads the authoritative rows.
-          refreshStaffing()
+          void refreshStaffing()
         },
       )
       .subscribe((status) => {
         setChannelStatus(status)
-        if (shouldCatchUp(connectedBefore, status)) refreshStaffing()
+        if (shouldCatchUp(connectedBefore, status)) void refreshStaffing()
         if (status === 'SUBSCRIBED') connectedBefore = true
       })
 
